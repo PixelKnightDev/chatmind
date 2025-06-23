@@ -1,4 +1,4 @@
-import { ChatMessage } from '@/store/chat-store'
+import { Message as ChatMessage } from '@/types/chat'
 
 export interface MemoryContext {
   userId: string
@@ -100,7 +100,7 @@ export class MemoryManager {
     }
 
     // Simple compression: keep most recent and unique memories
-    const uniqueMemories = [...new Set(memories)]
+    const uniqueMemories = Array.from(new Set(memories))
     return uniqueMemories.slice(-this.config.maxMemories)
   }
 

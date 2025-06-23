@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChatMessage } from '@/store/chat-store'
+import { Message as ChatMessage } from '@/types/chat'
 
 interface MemoryInput {
   userId: string
