@@ -181,9 +181,9 @@ Update colors in `tailwind.config.ts` and component styles
 | `GROQ_API_KEY` | ✅ | Groq AI API key |
 | `CLOUDINARY_CLOUD_NAME` | ✅ | Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | ✅ | Cloudinary API key |
-| `CLOUDINARY_API_SECRET` | ✅ | Cloudinary secret |
+| `CLOUDINARY_API_SECRET` |  | Cloudinary secret |
 | `MONGODB_URI` | ❌ | MongoDB connection string |
-| `MEM0_API_KEY` | ❌ | Mem0 memory service key |
+| `MEM0_API_KEY` | ✅ | Mem0 memory service key |
 | `OPENAI_API_KEY` | ❌ | OpenAI API key |
 | `WEBHOOK_SECRET` | ❌ | Webhook signature verification |
 
