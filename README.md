@@ -17,7 +17,7 @@ A modern, full-featured ChatGPT clone built with Next.js 15, TypeScript, and Cle
 
 - **Next.js 15** (App Router) + TypeScript
 - **Clerk** for authentication
-- **Groq** for AI (Llama 3)
+- **Groq** for AI (Llama 3) via Vercel AI SDK
 - **Cloudinary** for file storage
 - **Zustand** for state management
 - **Tailwind CSS** + Radix UI(ShadCN)
@@ -27,7 +27,7 @@ A modern, full-featured ChatGPT clone built with Next.js 15, TypeScript, and Cle
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/yourusername/chatgpt-clone.git
+git clone https://github.com/pixelknightdev/chatgpt-clone.git
 cd chatgpt-clone
 npm install
 ```
@@ -181,9 +181,9 @@ Update colors in `tailwind.config.ts` and component styles
 | `GROQ_API_KEY` | ✅ | Groq AI API key |
 | `CLOUDINARY_CLOUD_NAME` | ✅ | Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | ✅ | Cloudinary API key |
-| `CLOUDINARY_API_SECRET` | ✅ | Cloudinary secret |
+| `CLOUDINARY_API_SECRET` |  | Cloudinary secret |
 | `MONGODB_URI` | ❌ | MongoDB connection string |
-| `MEM0_API_KEY` | ❌ | Mem0 memory service key |
+| `MEM0_API_KEY` | ✅ | Mem0 memory service key |
 | `OPENAI_API_KEY` | ❌ | OpenAI API key |
 | `WEBHOOK_SECRET` | ❌ | Webhook signature verification |
 
