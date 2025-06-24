@@ -34,7 +34,7 @@ npm install
 
 ### 2. Environment Setup
 
-Create `.env.example` to `.env.local` in the root directory:
+Change `.env.example` to `.env.local` in the root directory:
 
 ### 3. Get Your API Keys
 
