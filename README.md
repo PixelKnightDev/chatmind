@@ -1,6 +1,6 @@
 # ChatMind
 
-A modern, full-featured ChatGPT clone built with Next.js 15, TypeScript, and Clerk authentication. Features real-time chat, file uploads, user-specific conversations, and webhook support for external integrations.
+A modern, full-featured Chatbot built with Next.js 15, TypeScript, and Clerk authentication. Features real-time chat, file uploads, user-specific conversations, and webhook support for external integrations.
 
 ## ✨ Features
 
