@@ -14,14 +14,31 @@ import {
   DrawingPinIcon,
   DrawingPinFilledIcon
 } from '@radix-ui/react-icons'
+import { Chat } from '@/types/chat'
 
 interface ChatHistoryProps {
   showArchived?: boolean
   onClose?: () => void // For closing sidebar on mobile after chat selection
 }
 
+interface ChatActionsProps {
+  chat: {
+    id: string;
+    title: string;
+    isArchived: boolean;
+    isPinned: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    messages?: Array<unknown>;
+  };
+  onEdit: (id: string, title: string) => void;
+  onDelete: (id: string) => void;
+  onArchive: (id: string, isArchived: boolean) => void;
+  onPin: (id: string, isPinned: boolean) => void;
+}
+
 export function ChatHistory({ showArchived = false, onClose }: ChatHistoryProps) {
-  const { chats, currentChat, setCurrentChat, updateChat, deleteChat, loadChat } = useChatStore()
+  const { chats, currentChat, updateChat, deleteChat, loadChat } = useChatStore()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const router = useRouter()
@@ -37,7 +54,7 @@ export function ChatHistory({ showArchived = false, onClose }: ChatHistoryProps)
     return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
   })
 
-  const handleChatClick = (chat: any) => {
+  const handleChatClick = (chat: Chat) => {
     console.log('Loading chat:', chat.id, 'with', chat.messages?.length || 0, 'messages')
     
     // Load the chat and set it as current
@@ -171,7 +188,7 @@ export function ChatHistory({ showArchived = false, onClose }: ChatHistoryProps)
 }
 
 // Chat Actions Dropdown Component
-function ChatActions({ chat, onEdit, onDelete, onArchive, onPin }: any) {
+function ChatActions({ chat, onEdit, onDelete, onArchive, onPin }: ChatActionsProps) {
   const [showMenu, setShowMenu] = useState(false)
 
   return (

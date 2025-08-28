@@ -13,7 +13,7 @@ interface UploadedFile {
   publicId: string
 }
 
-export function useChat(chatId?: string) {
+export function useChat() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isStreaming, setIsStreaming] = useState(false)
@@ -21,7 +21,6 @@ export function useChat(chatId?: string) {
   const { 
     currentChat, 
     addMessage, 
-    updateMessage, 
     createChat, 
     setCurrentChat,
     updateChat 
@@ -132,7 +131,7 @@ export function useChat(chatId?: string) {
       setIsLoading(false)
       setIsStreaming(false)
     }
-  }, [currentChat, addMessage, updateMessage, createChat, setCurrentChat, updateChat, storeMemory, user])
+  }, [currentChat, addMessage, createChat, setCurrentChat, updateChat, storeMemory, user])
 
   const regenerateLastMessage = useCallback(async () => {
     if (!currentChat || currentChat.messages.length < 2) return

@@ -6,7 +6,14 @@ import { Button } from '@/components/ui/button'
 import { useUser } from '@clerk/nextjs'
 
 export function MemoryCleanup() {
-  const [memories, setMemories] = useState<any[]>([])
+
+  interface Memory {
+    id?: string;
+    text?: string;
+    memory?: string;
+    metadata?: Record<string, unknown>;
+  }
+  const [memories, setMemories] = useState<Memory[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const { user } = useUser()
 

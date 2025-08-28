@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { uploadToCloudinary } from '@/lib/cloudinary'
 
+interface CloudinaryUploadResult {
+  secure_url: string
+  public_id: string
+}
+
 export async function POST(request: NextRequest) {
   try {
     console.log('Upload API called')
-    
     // Check environment variables
     console.log('Cloudinary config check:', {
       cloud_name: !!process.env.CLOUDINARY_CLOUD_NAME,
@@ -14,9 +18,9 @@ export async function POST(request: NextRequest) {
 
     const data = await request.formData()
     const files: File[] = data.getAll('files') as unknown as File[]
-    
+
     console.log('Files received:', files.length)
-    
+
     if (!files || files.length === 0) {
       return NextResponse.json(
         { error: 'No files received' },
@@ -37,18 +41,20 @@ export async function POST(request: NextRequest) {
         console.log(`Uploading ${file.name} to Cloudinary...`)
         const result = await uploadToCloudinary(buffer, file.name)
         console.log(`Successfully uploaded ${file.name}`)
-        
+
+        const uploadResult = result as CloudinaryUploadResult
+
         uploadResults.push({
           originalName: file.name,
           size: file.size,
           type: file.type,
-          url: (result as any).secure_url,
-          publicId: (result as any).public_id,
+          url: uploadResult.secure_url,
+          publicId: uploadResult.public_id,
         })
       } catch (error) {
         console.error('Error uploading file:', error)
         return NextResponse.json(
-          { 
+          {
             error: `Failed to upload file: ${file.name}`,
             details: error instanceof Error ? error.message : 'Unknown error'
           },
@@ -65,7 +71,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json(
-      { 
+      {
         error: 'Internal server error',
         details: error instanceof Error ? error.message : 'Unknown error'
       },

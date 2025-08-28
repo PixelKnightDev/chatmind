@@ -6,6 +6,27 @@ export const mem0Client = new MemoryClient({
   apiKey: process.env.MEM0_API_KEY!,
 })
 
+// Type for Mem0 raw API response
+interface Mem0ApiMemory {
+  id?: string
+  memory?: string
+  score?: number
+  user_id?: string
+  agent_id?: string
+  app_id?: string
+  run_id?: string
+  hash?: string
+  metadata?: Record<string, unknown>
+  categories?: string[]
+  created_at?: string | Date
+  updated_at?: string | Date
+}
+
+// Type for paginated response
+interface Mem0PaginatedResponse {
+  memories: Mem0ApiMemory[]
+}
+
 // Types for Mem0 operations - Updated to match actual API
 export interface Mem0Memory {
   id: string
@@ -15,7 +36,7 @@ export interface Mem0Memory {
   app_id?: string
   run_id?: string
   hash?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   categories?: string[]
   created_at: string
   updated_at: string
@@ -27,7 +48,7 @@ export interface Mem0SearchResult {
   score?: number
   user_id?: string
   agent_id?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   categories?: string[]
 }
 
@@ -46,7 +67,7 @@ export class Mem0Service {
     text: string,
     userId: string,
     sessionId: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<string> {
     try {
       // Correct API usage: messages array first, then options
@@ -88,7 +109,7 @@ export class Mem0Service {
       
       // Handle the response array and map to our interface
       if (Array.isArray(response)) {
-        return response.map(memory => ({
+        return (response as Mem0ApiMemory[]).map((memory) => ({
           id: memory.id || '',
           memory: memory.memory || '',
           score: memory.score,
@@ -119,7 +140,7 @@ export class Mem0Service {
       
       // Handle different response formats
       if (Array.isArray(response)) {
-        return response.map(memory => ({
+        return (response as Mem0ApiMemory[]).map((memory) => ({
           id: memory.id || '',
           memory: memory.memory || '',
           user_id: memory.user_id || undefined,
@@ -140,7 +161,24 @@ export class Mem0Service {
       
       // Handle paginated response format
       if (response && typeof response === 'object' && 'memories' in response) {
-        return (response as any).memories || []
+        const paginatedResponse = response as Mem0PaginatedResponse
+        return paginatedResponse.memories.map((memory) => ({
+          id: memory.id || '',
+          memory: memory.memory || '',
+          user_id: memory.user_id || undefined,
+          agent_id: memory.agent_id || undefined,
+          app_id: memory.app_id || undefined,
+          run_id: memory.run_id || undefined,
+          hash: memory.hash || undefined,
+          metadata: memory.metadata || {},
+          categories: memory.categories || [],
+          created_at: memory.created_at ? 
+            (memory.created_at instanceof Date ? memory.created_at.toISOString() : String(memory.created_at)) 
+            : new Date().toISOString(),
+          updated_at: memory.updated_at ? 
+            (memory.updated_at instanceof Date ? memory.updated_at.toISOString() : String(memory.updated_at)) 
+            : new Date().toISOString()
+        }))
       }
       
       return []

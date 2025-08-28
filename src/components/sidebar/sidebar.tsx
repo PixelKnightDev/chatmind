@@ -1,12 +1,10 @@
 'use client'
 
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ChatHistory } from './chat-history'
 import { useChatStore } from '@/store/chat-store'
 import { useRouter } from 'next/navigation'
 import { 
-  PlusIcon,
   Cross1Icon,
   PersonIcon,
   ExitIcon,
@@ -23,7 +21,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ onClose, isCollapsed, onToggle }: SidebarProps) {
-  const { chats, createNewChat, setCurrentChat, clearAllChats } = useChatStore()
+  const { chats, createNewChat, clearAllChats } = useChatStore()
   const { signOut } = useClerk()
   const router = useRouter()
 

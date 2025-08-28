@@ -2,14 +2,14 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { MessageActions } from './message-actions'
-import { cn } from '@/lib/utils'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import { PersonIcon, Pencil1Icon, CheckIcon, Cross1Icon } from '@radix-ui/react-icons'
+import { Pencil1Icon, CheckIcon, Cross1Icon } from '@radix-ui/react-icons'
 import { Button } from '@/components/ui/button'
 import { useChatStore } from '@/store/chat-store'
 import { formatFileSize, getFileIconType } from '@/lib/file-processing'
+import Image from 'next/image'
 
 interface UploadedFile {
   originalName: string
@@ -38,11 +38,10 @@ interface Message {
 
 interface MessageItemProps {
   message: Message
-  isLatest?: boolean
   onEdit?: (messageId: string, newContent: string) => void
 }
 
-export function MessageItem({ message, isLatest, onEdit }: MessageItemProps) {
+export function MessageItem({ message, onEdit }: MessageItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState(message.content)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -185,9 +184,11 @@ export function MessageItem({ message, isLatest, onEdit }: MessageItemProps) {
                   >
                     {file.type.startsWith('image/') ? (
                       <div className="flex items-center gap-2">
-                        <img
+                        <Image
                           src={file.url}
                           alt={file.originalName}
+                          width={32}
+                          height={32}
                           className="w-8 h-8 rounded object-cover"
                         />
                         <div className="flex flex-col min-w-0">
@@ -290,9 +291,11 @@ export function MessageItem({ message, isLatest, onEdit }: MessageItemProps) {
                   .filter(f => f.type.startsWith('image/'))
                   .map((file, index) => (
                     <div key={index} className="rounded-lg overflow-hidden max-w-sm">
-                      <img
+                      <Image
                         src={file.url}
                         alt={file.originalName}
+                        width={400}
+                        height={256}
                         className="max-w-full h-auto max-h-64 rounded-lg border border-[#404040]"
                       />
                     </div>
@@ -325,7 +328,7 @@ export function MessageItem({ message, isLatest, onEdit }: MessageItemProps) {
                   }
                   return (
                     <SyntaxHighlighter
-                      style={oneDark as any}
+                      style={oneDark as Record<string, React.CSSProperties>}
                       language={match[1]}
                       PreTag="div"
                       className="rounded-md my-4"

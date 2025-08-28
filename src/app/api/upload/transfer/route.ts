@@ -53,19 +53,22 @@ export async function POST(request: NextRequest) {
       file: file
     })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Transfer error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to transfer file',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
       },
       { status: 500 }
     )
   }
 }
 
-// Optional: Delete from Uploadcare after transfer
+// Optional: Delete from Uploadcare after transfer (currently unused but kept for future use)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function deleteFromUploadcare(uuid: string) {
   try {
     const response = await fetch(`https://api.uploadcare.com/files/${uuid}/`, {

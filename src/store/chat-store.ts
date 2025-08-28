@@ -46,10 +46,10 @@ export const useChatStore = create<ChatStore>()(
       currentUserId: null,
 
       setCurrentUser: (userId: string | null) => {
-        const state = get()
+        const currentState = get()
         
         // If switching to a different user, clear current data
-        if (state.currentUserId !== userId) {
+        if (currentState.currentUserId !== userId) {
           set({
             currentUserId: userId,
             currentChat: null,
@@ -67,8 +67,8 @@ export const useChatStore = create<ChatStore>()(
       },
 
       createChat: (title: string) => {
-        const state = get()
-        if (!state.currentUserId) {
+        const currentState = get()
+        if (!currentState.currentUserId) {
           console.warn('Cannot create chat: No user logged in')
           return {} as Chat
         }
@@ -81,7 +81,7 @@ export const useChatStore = create<ChatStore>()(
           updatedAt: new Date(),
           isPinned: false,
           isArchived: false,
-          userId: state.currentUserId, // Associate with current user
+          userId: currentState.currentUserId, // Associate with current user
         }
 
         set((state) => ({
@@ -93,8 +93,8 @@ export const useChatStore = create<ChatStore>()(
       },
 
       createNewChat: () => {
-        const state = get()
-        if (!state.currentUserId) {
+        const currentState = get()
+        if (!currentState.currentUserId) {
           console.warn('Cannot create chat: No user logged in')
           return {} as Chat
         }
@@ -107,7 +107,7 @@ export const useChatStore = create<ChatStore>()(
           updatedAt: new Date(),
           isPinned: false,
           isArchived: false,
-          userId: state.currentUserId, // Associate with current user
+          userId: currentState.currentUserId, // Associate with current user
         }
 
         set((state) => ({
@@ -119,9 +119,9 @@ export const useChatStore = create<ChatStore>()(
       },
 
       loadChat: (chatId: string) => {
-        const state = get()
+        const currentState = get()
         // Only load chats that belong to the current user
-        const chat = state.chats.find(c => c.id === chatId && c.userId === state.currentUserId)
+        const chat = currentState.chats.find(c => c.id === chatId && c.userId === currentState.currentUserId)
         if (chat) {
           set({ currentChat: chat })
           return chat
@@ -130,46 +130,46 @@ export const useChatStore = create<ChatStore>()(
       },
 
       setCurrentChat: (chat: Chat | null) => {
-        const state = get()
+        const currentState = get()
         // Only set chat if it belongs to current user or is null
-        if (!chat || chat.userId === state.currentUserId) {
+        if (!chat || chat.userId === currentState.currentUserId) {
           set({ currentChat: chat })
         }
       },
 
       updateChat: (chatId: string, updates: Partial<Chat>) => {
-        const state = get()
+        const currentState = get()
         set((state) => ({
           chats: state.chats.map((chat) =>
-            chat.id === chatId && chat.userId === state.currentUserId
+            chat.id === chatId && chat.userId === currentState.currentUserId
               ? { ...chat, ...updates, updatedAt: new Date() }
               : chat
           ),
           currentChat:
-            state.currentChat?.id === chatId && state.currentChat?.userId === state.currentUserId
+            state.currentChat?.id === chatId && state.currentChat?.userId === currentState.currentUserId
               ? { ...state.currentChat, ...updates, updatedAt: new Date() }
               : state.currentChat,
         }))
       },
 
       deleteChat: (chatId: string) => {
-        const state = get()
+        const currentState = get()
         set((state) => ({
           chats: state.chats.filter((chat) => 
-            !(chat.id === chatId && chat.userId === state.currentUserId)
+            !(chat.id === chatId && chat.userId === currentState.currentUserId)
           ),
           currentChat:
-            state.currentChat?.id === chatId && state.currentChat?.userId === state.currentUserId 
+            state.currentChat?.id === chatId && state.currentChat?.userId === currentState.currentUserId 
               ? null 
               : state.currentChat,
         }))
       },
 
       addMessage: (chatId: string, message: Message) => {
-        const state = get()
+        const currentState = get()
         set((state) => {
           const updatedChats = state.chats.map((chat) =>
-            chat.id === chatId && chat.userId === state.currentUserId
+            chat.id === chatId && chat.userId === currentState.currentUserId
               ? {
                   ...chat,
                   messages: [...chat.messages, message],
@@ -181,7 +181,7 @@ export const useChatStore = create<ChatStore>()(
           return {
             chats: updatedChats,
             currentChat:
-              state.currentChat?.id === chatId && state.currentChat?.userId === state.currentUserId
+              state.currentChat?.id === chatId && state.currentChat?.userId === currentState.currentUserId
                 ? {
                     ...state.currentChat,
                     messages: [...state.currentChat.messages, message],
@@ -193,7 +193,7 @@ export const useChatStore = create<ChatStore>()(
       },
 
       updateMessage: (chatId: string, messageId: string, updates: Partial<Message>) => {
-        const state = get()
+        const currentState = get()
         set((state) => {
           const updateMessages = (messages: Message[]) =>
             messages.map((msg) =>
@@ -201,7 +201,7 @@ export const useChatStore = create<ChatStore>()(
             )
 
           const updatedChats = state.chats.map((chat) =>
-            chat.id === chatId && chat.userId === state.currentUserId
+            chat.id === chatId && chat.userId === currentState.currentUserId
               ? {
                   ...chat,
                   messages: updateMessages(chat.messages),
@@ -213,7 +213,7 @@ export const useChatStore = create<ChatStore>()(
           return {
             chats: updatedChats,
             currentChat:
-              state.currentChat?.id === chatId && state.currentChat?.userId === state.currentUserId
+              state.currentChat?.id === chatId && state.currentChat?.userId === currentState.currentUserId
                 ? {
                     ...state.currentChat,
                     messages: updateMessages(state.currentChat.messages),
@@ -225,13 +225,13 @@ export const useChatStore = create<ChatStore>()(
       },
 
       removeMessage: (chatId: string, messageId: string) => {
-        const state = get()
+        const currentState = get()
         set((state) => {
           const filterMessages = (messages: Message[]) =>
             messages.filter((msg) => msg.id !== messageId)
 
           const updatedChats = state.chats.map((chat) =>
-            chat.id === chatId && chat.userId === state.currentUserId
+            chat.id === chatId && chat.userId === currentState.currentUserId
               ? {
                   ...chat,
                   messages: filterMessages(chat.messages),
@@ -243,7 +243,7 @@ export const useChatStore = create<ChatStore>()(
           return {
             chats: updatedChats,
             currentChat:
-              state.currentChat?.id === chatId && state.currentChat?.userId === state.currentUserId
+              state.currentChat?.id === chatId && state.currentChat?.userId === currentState.currentUserId
                 ? {
                     ...state.currentChat,
                     messages: filterMessages(state.currentChat.messages),
@@ -255,7 +255,7 @@ export const useChatStore = create<ChatStore>()(
       },
 
       addAttachmentToMessage: (chatId: string, messageId: string, attachment: UploadedFile) => {
-        const state = get()
+        const currentState = get()
         set((state) => {
           const updateMessages = (messages: Message[]) =>
             messages.map((msg) =>
@@ -268,7 +268,7 @@ export const useChatStore = create<ChatStore>()(
             )
 
           const updatedChats = state.chats.map((chat) =>
-            chat.id === chatId && chat.userId === state.currentUserId
+            chat.id === chatId && chat.userId === currentState.currentUserId
               ? {
                   ...chat,
                   messages: updateMessages(chat.messages),
@@ -280,7 +280,7 @@ export const useChatStore = create<ChatStore>()(
           return {
             chats: updatedChats,
             currentChat:
-              state.currentChat?.id === chatId && state.currentChat?.userId === state.currentUserId
+              state.currentChat?.id === chatId && state.currentChat?.userId === currentState.currentUserId
                 ? {
                     ...state.currentChat,
                     messages: updateMessages(state.currentChat.messages),
@@ -292,7 +292,7 @@ export const useChatStore = create<ChatStore>()(
       },
 
       removeAttachmentFromMessage: (chatId: string, messageId: string, attachmentIndex: number) => {
-        const state = get()
+        const currentState = get()
         set((state) => {
           const updateMessages = (messages: Message[]) =>
             messages.map((msg) =>
@@ -305,7 +305,7 @@ export const useChatStore = create<ChatStore>()(
             )
 
           const updatedChats = state.chats.map((chat) =>
-            chat.id === chatId && chat.userId === state.currentUserId
+            chat.id === chatId && chat.userId === currentState.currentUserId
               ? {
                   ...chat,
                   messages: updateMessages(chat.messages),
@@ -317,7 +317,7 @@ export const useChatStore = create<ChatStore>()(
           return {
             chats: updatedChats,
             currentChat:
-              state.currentChat?.id === chatId && state.currentChat?.userId === state.currentUserId
+              state.currentChat?.id === chatId && state.currentChat?.userId === currentState.currentUserId
                 ? {
                     ...state.currentChat,
                     messages: updateMessages(state.currentChat.messages),
@@ -329,7 +329,7 @@ export const useChatStore = create<ChatStore>()(
       },
 
       editMessage: (chatId: string, messageId: string, newContent: string) => {
-        const state = get()
+        const currentState = get()
         set((state) => {
           const updateMessages = (messages: Message[]) =>
             messages.map((msg) =>
@@ -347,7 +347,7 @@ export const useChatStore = create<ChatStore>()(
             )
 
           const updatedChats = state.chats.map((chat) =>
-            chat.id === chatId && chat.userId === state.currentUserId
+            chat.id === chatId && chat.userId === currentState.currentUserId
               ? {
                   ...chat,
                   messages: updateMessages(chat.messages),
@@ -359,7 +359,7 @@ export const useChatStore = create<ChatStore>()(
           return {
             chats: updatedChats,
             currentChat:
-              state.currentChat?.id === chatId && state.currentChat?.userId === state.currentUserId
+              state.currentChat?.id === chatId && state.currentChat?.userId === currentState.currentUserId
                 ? {
                     ...state.currentChat,
                     messages: updateMessages(state.currentChat.messages),
@@ -371,13 +371,13 @@ export const useChatStore = create<ChatStore>()(
       },
 
       deleteMessagesFromIndex: (chatId: string, fromIndex: number) => {
-        const state = get()
+        const currentState = get()
         set((state) => {
           const filterMessages = (messages: Message[]) =>
             messages.slice(0, fromIndex)
 
           const updatedChats = state.chats.map((chat) =>
-            chat.id === chatId && chat.userId === state.currentUserId
+            chat.id === chatId && chat.userId === currentState.currentUserId
               ? {
                   ...chat,
                   messages: filterMessages(chat.messages),
@@ -389,7 +389,7 @@ export const useChatStore = create<ChatStore>()(
           return {
             chats: updatedChats,
             currentChat:
-              state.currentChat?.id === chatId && state.currentChat?.userId === state.currentUserId
+              state.currentChat?.id === chatId && state.currentChat?.userId === currentState.currentUserId
                 ? {
                     ...state.currentChat,
                     messages: filterMessages(state.currentChat.messages),
@@ -401,9 +401,9 @@ export const useChatStore = create<ChatStore>()(
       },
 
       getMessageIndex: (chatId: string, messageId: string) => {
-        const state = get()
-        const chat = state.chats.find(c => c.id === chatId && c.userId === state.currentUserId) || state.currentChat
-        if (!chat || chat.userId !== state.currentUserId) return -1
+        const currentState = get()
+        const chat = currentState.chats.find(c => c.id === chatId && c.userId === currentState.currentUserId) || currentState.currentChat
+        if (!chat || chat.userId !== currentState.currentUserId) return -1
         return chat.messages.findIndex(msg => msg.id === messageId)
       },
 
@@ -412,10 +412,10 @@ export const useChatStore = create<ChatStore>()(
       },
 
       clearAllChats: () => {
-        const state = get()
+        const currentState = get()
         // Only clear chats for current user
         set((state) => ({
-          chats: state.chats.filter(chat => chat.userId !== state.currentUserId),
+          chats: state.chats.filter(chat => chat.userId !== currentState.currentUserId),
           currentChat: null
         }))
       },

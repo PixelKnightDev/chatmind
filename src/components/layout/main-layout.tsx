@@ -7,6 +7,7 @@ import { HamburgerMenuIcon } from '@radix-ui/react-icons'
 import { SignedIn, SignedOut, SignInButton, useUser, useClerk } from '@clerk/nextjs'
 import { cn } from '@/lib/utils'
 import { useUserChatSync } from '@/hooks/use-user-chat-sync'
+import Image from 'next/image'
 
 // Account Dropdown Component
 function AccountDropdown() {
@@ -30,9 +31,11 @@ function AccountDropdown() {
           className="h-8 w-8 p-0 text-white/60 hover:text-white hover:bg-white/10 rounded-full"
         >
           {user?.imageUrl ? (
-            <img 
+            <Image 
               src={user.imageUrl} 
               alt="Profile" 
+              width={24}
+              height={24}
               className="h-6 w-6 rounded-full"
             />
           ) : (

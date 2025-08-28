@@ -1,4 +1,5 @@
 'use client'
+
 import { MessageItem } from './message-item'
 
 // Use the same Message interface as MessageItem
@@ -42,7 +43,7 @@ interface ExtendedMessage {
     isEdited?: boolean
     originalContent?: string
     isStreaming?: boolean
-    [key: string]: any
+    [key: string]: unknown
   }
 }
 
@@ -54,7 +55,7 @@ interface MessageListProps {
 export function MessageList({ messages, onMessageEdit }: MessageListProps) {
   // Filter messages to only include user and assistant roles
   const displayableMessages: Message[] = messages
-    .filter((message): message is ExtendedMessage & { role: 'user' | 'assistant' } => 
+    .filter((message): message is ExtendedMessage & { role: 'user' | 'assistant' } =>
       message.role === 'user' || message.role === 'assistant'
     )
     .map(message => ({
@@ -72,7 +73,6 @@ export function MessageList({ messages, onMessageEdit }: MessageListProps) {
         <MessageItem
           key={message.id || index}
           message={message}
-          isLatest={index === displayableMessages.length - 1}
           onEdit={onMessageEdit}
         />
       ))}

@@ -9,7 +9,7 @@ interface WebhookEvent {
   id: string
   type: string
   timestamp: string
-  data: any
+  data: Record<string, unknown>
 }
 
 interface FileProcessingWebhook extends WebhookEvent {
@@ -220,7 +220,7 @@ export async function POST(request: NextRequest) {
     let webhook: WebhookEvent
     try {
       webhook = JSON.parse(body)
-    } catch (error) {
+    } catch {
       console.error('Invalid JSON in webhook body')
       return NextResponse.json(
         { error: 'Invalid JSON' },

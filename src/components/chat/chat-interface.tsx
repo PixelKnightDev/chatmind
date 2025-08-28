@@ -7,9 +7,7 @@ import { TypingIndicator } from './typing-indicator'
 import { useChatStore } from '@/store/chat-store'
 import { useMemory } from '@/hooks/use-memory'
 import { trimMessagesForContext, getModelInfo, needsTrimming } from '@/lib/context-window'
-import { cn } from '@/lib/utils'
 import { useUser } from '@clerk/nextjs'
-import type { Message as AIMessage } from 'ai'
 import type { Message as ChatMessage, UploadedFile } from '@/types/chat'
 
 interface ChatInterfaceProps {
@@ -24,19 +22,18 @@ interface StreamingMessage {
   content: string
   isStreaming: boolean
   createdAt: Date
-  metadata?: any
+  metadata?: Record<string, unknown>
 }
 
-export function ChatInterface({ chatId, className, model = 'llama3-8b-8192' }: ChatInterfaceProps) {
-  const { currentChat, setCurrentChat, addMessage, updateMessage, createChat } = useChatStore()
-  const { storeMemory, retrieveMemory } = useMemory()
+export function ChatInterface({ model = 'llama3-8b-8192' }: ChatInterfaceProps) {
+  const { currentChat, addMessage, createChat } = useChatStore()
+  const { storeMemory } = useMemory()
   const { user } = useUser()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
   const [streamingMessage, setStreamingMessage] = useState<StreamingMessage | null>(null)
   const [contextInfo, setContextInfo] = useState<{
     totalMessages: number
@@ -44,14 +41,6 @@ export function ChatInterface({ chatId, className, model = 'llama3-8b-8192' }: C
     removedMessages: number
     totalTokens: number
   } | null>(null)
-
-  // Convert store messages to AI Message format (for API calls)
-  const apiMessages: AIMessage[] = currentChat?.messages?.map(msg => ({
-    id: msg.id,
-    role: msg.role,
-    content: msg.content,
-    createdAt: msg.createdAt,
-  })) || []
 
   // Messages for UI rendering (with full metadata and attachments)
   const uiMessages: ChatMessage[] = [
@@ -80,7 +69,7 @@ export function ChatInterface({ chatId, className, model = 'llama3-8b-8192' }: C
   }, [])
 
   // Function to stream response from API
-  const streamFromAPI = useCallback(async (messagesToSend: any[], chatId: string, attachedFiles?: UploadedFile[]) => {
+  const streamFromAPI = useCallback(async (messagesToSend: Array<{ role: string; content: string }>, chatId: string, attachedFiles?: UploadedFile[]) => {
     const userId = user?.id || 'default_user'
 
     // Apply context window trimming
@@ -194,7 +183,7 @@ export function ChatInterface({ chatId, className, model = 'llama3-8b-8192' }: C
                   content: fullContent
                 } : null)
               }
-            } catch (e) {
+            } catch {
               // Skip invalid JSON lines
               console.warn('Failed to parse streaming chunk:', data)
             }
@@ -209,11 +198,10 @@ export function ChatInterface({ chatId, className, model = 'llama3-8b-8192' }: C
   }, [user, model])
 
   // Handle message editing with streaming
-  const handleMessageEdit = useCallback(async (messageId: string, newContent: string) => {
+  const handleMessageEdit = useCallback(async (messageId: string) => {
     if (!currentChat) return
 
     setIsLoading(true)
-    setError(null)
 
     try {
       await new Promise(resolve => setTimeout(resolve, 50))
@@ -259,7 +247,6 @@ export function ChatInterface({ chatId, className, model = 'llama3-8b-8192' }: C
     } catch (err) {
       setStreamingMessage(null)
       console.error('Error regenerating after edit:', err)
-      setError(err instanceof Error ? err : new Error('Unknown error'))
       
       if (currentChat) {
         const errorMessage: ChatMessage = {
@@ -290,7 +277,6 @@ export function ChatInterface({ chatId, className, model = 'llama3-8b-8192' }: C
     const userMessageContent = input.trim()
     setInput('')
     setIsLoading(true)
-    setError(null)
 
     try {
       // Create chat if none exists
@@ -345,7 +331,6 @@ export function ChatInterface({ chatId, className, model = 'llama3-8b-8192' }: C
     } catch (err) {
       setStreamingMessage(null)
       console.error('Chat error:', err)
-      setError(err instanceof Error ? err : new Error('Unknown error'))
       
       if (currentChat) {
         const errorMessage: ChatMessage = {
@@ -367,15 +352,6 @@ export function ChatInterface({ chatId, className, model = 'llama3-8b-8192' }: C
     }
     setIsLoading(false)
     setStreamingMessage(null)
-  }
-
-  const handleRetry = () => {
-    if (uiMessages.length > 0) {
-      const lastUserMessage = uiMessages.filter(m => m.role === 'user').pop()
-      if (lastUserMessage) {
-        setInput(lastUserMessage.content)
-      }
-    }
   }
 
   // Check if current conversation needs trimming
@@ -421,7 +397,7 @@ export function ChatInterface({ chatId, className, model = 'llama3-8b-8192' }: C
       ) : (
         // Messages Area
         <div className="flex-1 overflow-y-auto">
-          <MessageList messages={uiMessages as any} onMessageEdit={handleMessageEdit} />
+          <MessageList messages={uiMessages} onMessageEdit={handleMessageEdit} />
           {isLoading && !streamingMessage && <TypingIndicator />}
           <div ref={messagesEndRef} />
         </div>

@@ -26,7 +26,7 @@ export interface Message {
     originalContent?: string
     isStreaming?: boolean
     hasAttachments?: boolean  // Add this line
-    [key: string]: any        // Add this for flexibility
+    [key: string]: unknown        // Add this for flexibility
   }
 }
 

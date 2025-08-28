@@ -12,6 +12,10 @@ interface UploadedFile {
   uploadcareUuid?: string
 }
 
+interface Memory {
+  memory: string
+}
+
 // Memory service import
 async function getMemoryService() {
   try {
@@ -107,7 +111,7 @@ export async function POST(request: NextRequest) {
     const memory = await getMemoryService()
 
     // Process the last message if it has attachments
-    let enhancedMessages = [...messages]
+    const enhancedMessages = [...messages]
     if (attachments && attachments.length > 0) {
       const lastMessage = messages[messages.length - 1]
       
@@ -145,7 +149,7 @@ export async function POST(request: NextRequest) {
 
         if (memories && memories.length > 0) {
           memoryContext = `\n\nRelevant context from previous conversations:\n${memories
-            .map((mem: any) => `- ${mem.memory}`)
+            .map((mem: Memory) => `- ${mem.memory}`)
             .join('\n')}`
         }
       } catch (memoryError) {
@@ -285,11 +289,13 @@ export async function POST(request: NextRequest) {
       },
     })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Chat API error:', error)
 
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+
     // Handle specific errors
-    if (error?.message?.includes('rate limit')) {
+    if (errorMessage.includes('rate limit')) {
       return NextResponse.json(
         { 
           error: 'Rate limit exceeded. Please try again in a moment.',
@@ -299,7 +305,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (error?.message?.includes('context') || error?.message?.includes('token')) {
+    if (errorMessage.includes('context') || errorMessage.includes('token')) {
       return NextResponse.json(
         { 
           error: 'Message too long. Please try a shorter message or fewer files.',
@@ -309,7 +315,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (error?.message?.includes('API key')) {
+    if (errorMessage.includes('API key')) {
       return NextResponse.json(
         { 
           error: 'AI service configuration error.',
@@ -323,7 +329,7 @@ export async function POST(request: NextRequest) {
       { 
         error: 'Internal server error. Please try again later.',
         type: 'internal_error',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
       },
       { status: 500 }
     )

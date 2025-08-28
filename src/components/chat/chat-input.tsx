@@ -50,7 +50,9 @@ export function ChatInput({
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       if (!disabled && (input.trim() || attachedFiles.length > 0)) {
-        handleSubmit(e as any, attachedFiles)
+        // Create a synthetic form event for consistency
+        const formEvent = new Event('submit') as unknown as React.FormEvent
+        handleSubmit(formEvent, attachedFiles)
         setAttachedFiles([]) // Clear files after sending
       }
     }
